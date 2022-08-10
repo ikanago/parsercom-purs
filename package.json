@@ -5,7 +5,7 @@
     "run": "npx spago run",
     "test": "npx spago test",
     "fmt": "npx purs-tidy format-in-place",
-    "fmt-check": "npx purs-tidy check"
+    "fmt-check": "npx purs-tidy check ./src ./test"
   },
   "devDependencies": {
     "purs-tidy": "^0.9.1",
