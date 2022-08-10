@@ -1,0 +1,14 @@
+{
+  "name": "parsercom-purs",
+  "scripts": {
+    "build": "npx spago build",
+    "run": "npx spago run",
+    "test": "npx spago test",
+    "fmt": "npx purs-tidy format-in-place",
+    "fmt-check": "npx purs-tidy check"
+  },
+  "devDependencies": {
+    "purs-tidy": "^0.9.1",
+    "spago": "^0.20.9"
+  }
+}
