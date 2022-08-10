@@ -8,8 +8,8 @@
     "fmt-check": "npx purs-tidy check ./src ./test"
   },
   "devDependencies": {
-    "purescript": "^0.15.4",
-    "purs-tidy": "^0.9.1",
-    "spago": "^0.20.9"
+    "purescript": "0.15.4",
+    "purs-tidy": "0.9.1",
+    "spago": "0.20.9"
   }
 }
