@@ -5,6 +5,7 @@ module Parser
   , TokenPos
   , consume
   , evalParserStr
+  , failWith
   , peek
   , runParser
   , runParserStr
@@ -22,6 +23,8 @@ type TokenPos = Int
 initPos :: TokenPos
 initPos = 0
 
+-- | Represents a current state of parsed input.
+-- | TokenPos points to the next character to be evaluated.
 data ParseState = ParseState String TokenPos
 
 instance showParseState :: Show ParseState where
@@ -42,16 +45,24 @@ consume s@(ParseState array pos) = Tuple a (ParseState array pos')
 
 type ParseError = String
 
+-- | The `Parser a` monad with result type `a`.
 newtype Parser a = Parser ((ParseState) -> (Tuple (Either ParseError a) ParseState))
 
+-- | Run a parser for a given input.
 runParser :: forall a. Parser a -> ParseState -> (Tuple (Either ParseError a) ParseState)
 runParser (Parser p) s = p s
 
+-- | Run a parser for a given string input.
 runParserStr :: forall a. Parser a -> String -> (Tuple (Either ParseError a) ParseState)
 runParserStr p s = runParser p (ParseState s initPos)
 
+-- | Run a parser for a given string input and return only the result.
 evalParserStr :: forall a. Parser a -> String -> Either ParseError a
 evalParserStr p s = fst $ runParserStr p s
+
+failWith :: forall a. ParseError -> Parser a
+failWith err = Parser $ \s ->
+  Tuple (Left err) s
 
 instance functorParser :: Functor Parser where
   map f p = Parser $ \s ->
