@@ -12,13 +12,15 @@ to generate this file without the comments in this block.
 -}
 { name = "my-project"
 , dependencies =
-  [ "arrays"
-  , "console"
+  [ "aff"
   , "effect"
   , "either"
+  , "exceptions"
   , "maybe"
   , "prelude"
+  , "spec"
   , "strings"
+  , "transformers"
   , "tuples"
   ]
 , packages = ./packages.dhall

@@ -7,7 +7,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Parser (Parser(..), consume)
 
-anyChar :: Parser Char Char
+anyChar :: Parser Char
 anyChar = Parser $ \s ->
   let
     (Tuple c s') = consume s

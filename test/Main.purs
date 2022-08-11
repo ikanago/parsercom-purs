@@ -3,11 +3,11 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Class.Console (logShow)
-import Parser (parseStr)
-import Parser.Chars (anyChar)
+import Effect.Aff (launchAff_)
+import Test.Chars (chars)
+import Test.Spec.Reporter (consoleReporter)
+import Test.Spec.Runner (runSpec)
 
 main :: Effect Unit
-main = do
-  let p = anyChar >>= (\c -> anyChar >>= \d -> pure [ c, d ])
-  logShow $ parseStr p "str"
+main = launchAff_ $ runSpec [ consoleReporter ] do
+  chars

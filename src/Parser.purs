@@ -4,17 +4,17 @@ module Parser
   , Parser(..)
   , TokenPos
   , consume
-  , parseStr
+  , evalParserStr
   , peek
   , runParser
+  , runParserStr
   ) where
 
 import Prelude
 
-import Data.Array (index)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
-import Data.String.CodeUnits (toCharArray)
+import Data.String.CodeUnits (charAt)
 import Data.Tuple (Tuple(..), fst)
 
 type TokenPos = Int
@@ -22,14 +22,14 @@ type TokenPos = Int
 initPos :: TokenPos
 initPos = 0
 
-data ParseState t = ParseState (Array t) TokenPos
+data ParseState = ParseState String TokenPos
 
 -- instance showParseState :: Show ParseState where
 
-peek :: forall t. ParseState t -> Maybe t
-peek (ParseState array pos) = index array pos
+peek :: ParseState -> Maybe Char
+peek (ParseState str pos) = charAt pos str
 
-consume :: forall t. ParseState t -> Tuple (Maybe t) (ParseState t)
+consume :: ParseState -> Tuple (Maybe Char) ParseState
 consume s@(ParseState array pos) = Tuple a (ParseState array pos')
   where
   a = peek s
@@ -39,22 +39,25 @@ consume s@(ParseState array pos) = Tuple a (ParseState array pos')
 
 type ParseError = String
 
-newtype Parser t a = Parser ((ParseState t) -> (Tuple (Either ParseError a) (ParseState t)))
+newtype Parser a = Parser ((ParseState) -> (Tuple (Either ParseError a) ParseState))
 
-runParser :: forall t a. Parser t a -> ParseState t -> (Tuple (Either ParseError a) (ParseState t))
+runParser :: forall a. Parser a -> ParseState -> (Tuple (Either ParseError a) ParseState)
 runParser (Parser p) s = p s
 
-parseStr :: forall a. Parser Char a -> String -> Either ParseError a
-parseStr p s = fst $ runParser p (ParseState (toCharArray s) initPos)
+runParserStr :: forall a. Parser a -> String -> (Tuple (Either ParseError a) ParseState)
+runParserStr p s = runParser p (ParseState s initPos)
 
-instance functorParser :: Functor (Parser t) where
+evalParserStr :: forall a. Parser a -> String -> Either ParseError a
+evalParserStr p s = fst $ runParserStr p s
+
+instance functorParser :: Functor Parser where
   map f p = Parser $ \s ->
     let
       (Tuple res s') = runParser p s
     in
       Tuple (f <$> res) s'
 
-instance applyParser :: Apply (Parser t) where
+instance applyParser :: Apply Parser where
   apply fp p = Parser $ \s ->
     let
       (Tuple fp s') = runParser fp s
@@ -67,10 +70,10 @@ instance applyParser :: Apply (Parser t) where
           in
             Tuple (f <$> res) s''
 
-instance applicativeParser :: Applicative (Parser t) where
+instance applicativeParser :: Applicative Parser where
   pure x = Parser $ \s -> Tuple (Right x) s
 
-instance bindParser :: Bind (Parser t) where
+instance bindParser :: Bind Parser where
   bind p f = Parser $ \s ->
     let
       (Tuple res s') = runParser p s
@@ -79,4 +82,4 @@ instance bindParser :: Bind (Parser t) where
         Left e -> Tuple (Left e) s'
         Right res -> runParser (f res) s'
 
-instance monadParser :: Monad (Parser t)
+instance monadParser :: Monad Parser
