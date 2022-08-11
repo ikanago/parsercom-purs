@@ -5,7 +5,8 @@ import Prelude
 import Control.Monad.Error.Class (class MonadThrow)
 import Data.Either (Either(..))
 import Effect.Exception (Error)
-import Parser.Chars (anyChar, satisfy)
+import Parser (ParseError(..))
+import Parser.Chars (anyChar, digit, satisfy)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 
@@ -15,10 +16,16 @@ chars = do
     it "basic" do
       assertParser anyChar "str" (Right 's') 1
     it "parsing empty string causes an error" do
-      assertParser anyChar "" (Left "End of input") 0
+      assertParser anyChar "" (Left EndOfInput) 0
 
   describe "satisfy" do
     it "basic" do
-      assertParser (satisfy \c -> c == '1') "123" (Right '1') 1
+      assertParser (satisfy (_ == '1')) "123" (Right '1') 1
     it "predicate is not satisfied" do
-      assertParser (satisfy \c -> c == '1') "23" (Left "Given predicate is not satisfied") 1
+      assertParser (satisfy (_ == '1')) "23" (Left UnexpectedToken) 1
+
+  describe "digit" do
+    it "basic" do
+      assertParser digit "123" (Right '1') 1
+    it "fail" do
+      assertParser digit "abc" (Left UnexpectedToken) 1

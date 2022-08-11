@@ -1,5 +1,5 @@
 module Parser
-  ( ParseError
+  ( ParseError(..)
   , ParseState(..)
   , Parser(..)
   , TokenPos
@@ -43,7 +43,14 @@ consume s@(ParseState array pos) = Tuple a (ParseState array pos')
     Just _ -> pos + 1
     Nothing -> pos
 
-type ParseError = String
+data ParseError = EndOfInput | UnexpectedToken
+
+instance showParseError :: Show ParseError where
+  show err = case err of
+    EndOfInput -> "End of input"
+    UnexpectedToken -> "Unexpected token"
+
+derive instance eqParseError :: Eq ParseError
 
 -- | The `Parser a` monad with result type `a`.
 newtype Parser a = Parser ((ParseState) -> (Tuple (Either ParseError a) ParseState))
