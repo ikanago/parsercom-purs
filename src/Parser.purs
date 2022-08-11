@@ -24,7 +24,10 @@ initPos = 0
 
 data ParseState = ParseState String TokenPos
 
--- instance showParseState :: Show ParseState where
+instance showParseState :: Show ParseState where
+  show (ParseState s pos) = (show s) <> " at " <> (show pos)
+
+derive instance eqParseState :: Eq ParseState
 
 peek :: ParseState -> Maybe Char
 peek (ParseState str pos) = charAt pos str
