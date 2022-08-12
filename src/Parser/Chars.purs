@@ -1,8 +1,10 @@
 module Parser.Chars
   ( anyChar
+  , char
   , digit
   , satisfy
-  ) where
+  )
+  where
 
 import Prelude
 
@@ -41,4 +43,7 @@ digit = do
     '7' -> true
     '8' -> true
     '9' -> true
-    otherwise -> false
+    _ -> false
+
+char :: Char -> Parser Char
+char c = satisfy (_ == c)

@@ -6,7 +6,7 @@ import Control.Monad.Error.Class (class MonadThrow)
 import Data.Either (Either(..))
 import Effect.Exception (Error)
 import Parser (ParseError(..))
-import Parser.Chars (anyChar, digit, satisfy)
+import Parser.Chars (anyChar, char, digit, satisfy)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 
@@ -29,3 +29,9 @@ chars = do
       assertParser digit "123" (Right '1') 1
     it "fail" do
       assertParser digit "abc" (Left UnexpectedToken) 1
+
+  describe "char" do
+    it "basic" do
+      assertParser (char 'a') "abc" (Right 'a') 1
+    it "fail" do
+      assertParser (char 'x') "abc" (Left UnexpectedToken) 1
