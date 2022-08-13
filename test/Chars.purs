@@ -22,22 +22,22 @@ chars = do
     it "basic" do
       assertParser (satisfy (_ == '1')) "123" (Right '1') 1
     it "predicate is not satisfied" do
-      assertParser (satisfy (_ == '1')) "23" (Left UnexpectedToken) 1
+      assertParser (satisfy (_ == '1')) "23" (Left UnexpectedToken) 0
 
   describe "digit" do
     it "basic" do
       assertParser digit "123" (Right '1') 1
     it "fail" do
-      assertParser digit "abc" (Left UnexpectedToken) 1
+      assertParser digit "abc" (Left UnexpectedToken) 0
 
   describe "char" do
     it "basic" do
       assertParser (char 'a') "abc" (Right 'a') 1
     it "fail" do
-      assertParser (char 'x') "abc" (Left UnexpectedToken) 1
+      assertParser (char 'x') "abc" (Left UnexpectedToken) 0
 
   describe "string" do
     it "basic" do
-      assertParser (string "str") "string" (Right "str") 3 
+      assertParser (string "str") "string" (Right "str") 3
     it "fail" do
-      assertParser (string "str") "abc" (Left UnexpectedToken) 1 
+      assertParser (string "str") "abc" (Left UnexpectedToken) 0

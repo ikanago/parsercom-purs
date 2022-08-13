@@ -8,5 +8,5 @@ import Parser (Parser)
 
 sequence :: forall a. List (Parser a) -> Parser (List a)
 sequence ps = case ps of
-  Nil -> pure Nil 
-  Cons head tail -> (lift2 Cons) head (sequence tail) 
+  Nil -> pure Nil
+  Cons head tail -> (lift2 Cons) head (sequence tail)

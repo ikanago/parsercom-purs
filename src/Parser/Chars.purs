@@ -4,8 +4,7 @@ module Parser.Chars
   , digit
   , satisfy
   , string
-  )
-  where
+  ) where
 
 import Prelude
 
@@ -14,25 +13,25 @@ import Data.List (fromFoldable, toUnfoldable)
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Tuple (Tuple(..))
-import Parser (Parser(..), ParseError(..), consume, failWith)
+import Parser (ParseError(..), Parser(..), consume)
 import Parser.Combinator (sequence)
 
 -- | Parse the first character in the state.
 anyChar :: Parser Char
-anyChar = Parser $ \s ->
+anyChar = satisfy (const true)
+
+-- | Parse if a predicate is true for the first character in the state.
+-- | This combinator consumes the first character when succeeded, but leaves the state as it is when failed.
+satisfy :: (Char -> Boolean) -> Parser Char
+satisfy pred = Parser $ \s ->
   let
     (Tuple c s') = consume s
   in
     case c of
-      Just c -> Tuple (Right c) s'
-      Nothing -> Tuple (Left EndOfInput) s'
-
--- | Parse if a predicate is true for the first character in the state.
--- | This combinator consumes the first character even if the predicate is not satisfied.
-satisfy :: (Char -> Boolean) -> Parser Char
-satisfy pred = do
-  c <- anyChar
-  if pred c then pure c else failWith UnexpectedToken
+      Nothing -> Tuple (Left EndOfInput) s
+      Just c ->
+        if pred c then Tuple (Right c) s'
+        else Tuple (Left UnexpectedToken) s
 
 digit :: Parser Char
 digit = do
