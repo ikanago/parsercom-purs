@@ -13,6 +13,7 @@ module Parser
 
 import Prelude
 
+import Control.Alt (class Alt)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (charAt)
@@ -104,3 +105,12 @@ instance bindParser :: Bind Parser where
         Right res -> runParser (f res) s'
 
 instance monadParser :: Monad Parser
+
+instance altParser :: Alt Parser where
+  alt p1 p2 = Parser $ \s ->
+    let
+      (Tuple res s') = runParser p1 s
+    in
+      case res of
+        Left _ -> runParser p2 s
+        Right res -> Tuple (Right res) s'

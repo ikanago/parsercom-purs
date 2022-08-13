@@ -51,4 +51,4 @@ char :: Char -> Parser Char
 char c = satisfy (_ == c)
 
 string :: String -> Parser String
-string s = s # toCharArray <#> char # sequence <#> (fromCharArray)
+string s = s # toCharArray <#> char # sequence <#> fromCharArray
