@@ -9,12 +9,11 @@ module Parser.Chars
 import Prelude
 
 import Data.Either (Either(..))
-import Data.List (fromFoldable, toUnfoldable)
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (fromCharArray, toCharArray)
+import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Parser (ParseError(..), Parser(..), consume)
-import Parser.Combinator (sequence)
 
 -- | Parse the first character in the state.
 anyChar :: Parser Char
@@ -52,4 +51,4 @@ char :: Char -> Parser Char
 char c = satisfy (_ == c)
 
 string :: String -> Parser String
-string s = s # toCharArray # fromFoldable <#> char # sequence <#> (toUnfoldable >>> fromCharArray)
+string s = s # toCharArray <#> char # sequence <#> (fromCharArray)
