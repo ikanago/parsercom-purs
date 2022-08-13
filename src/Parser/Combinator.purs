@@ -1,12 +1,10 @@
-module Parser.Combinator where
+module Parser.Combinator
+  ( interpose
+  ) where
 
 import Prelude
 
-import Control.Apply (lift2)
-import Data.List (List(..))
 import Parser (Parser)
 
-sequence :: forall a. List (Parser a) -> Parser (List a)
-sequence ps = case ps of
-  Nil -> pure Nil
-  Cons head tail -> (lift2 Cons) head (sequence tail)
+interpose :: forall a b c. Parser a -> Parser b -> Parser c -> Parser c
+interpose popen pclose p = popen *> p <* pclose
