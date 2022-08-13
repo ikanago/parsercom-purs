@@ -3,15 +3,19 @@ module Parser.Chars
   , char
   , digit
   , satisfy
+  , string
   )
   where
 
 import Prelude
 
 import Data.Either (Either(..))
+import Data.List (fromFoldable, toUnfoldable)
 import Data.Maybe (Maybe(..))
+import Data.String.CodeUnits (fromCharArray, toCharArray)
 import Data.Tuple (Tuple(..))
 import Parser (Parser(..), ParseError(..), consume, failWith)
+import Parser.Combinator (sequence)
 
 -- | Parse the first character in the state.
 anyChar :: Parser Char
@@ -47,3 +51,6 @@ digit = do
 
 char :: Char -> Parser Char
 char c = satisfy (_ == c)
+
+string :: String -> Parser String
+string s = s # toCharArray # fromFoldable <#> char # sequence <#> (toUnfoldable >>> fromCharArray)
