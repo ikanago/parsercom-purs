@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "purescript": "0.15.4",
-    "purs-tidy": "0.9.1",
+    "purs-tidy": "0.9.2",
     "spago": "0.20.9"
   }
 }
