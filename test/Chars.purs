@@ -6,7 +6,7 @@ import Control.Monad.Error.Class (class MonadThrow)
 import Data.Either (Either(..))
 import Effect.Exception (Error)
 import Parser (ParseError(..))
-import Parser.Chars (anyChar, char, digit, satisfy, string)
+import Parser.Chars (anyChar, char, digit, satisfy, spaces, string)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 
@@ -41,3 +41,15 @@ chars = do
       assertParser (string "str") "string" (Right "str") 3
     it "fail" do
       assertParser (string "str") "abc" (Left UnexpectedToken) 0
+
+  describe "spaces" do
+    it "basic" do
+      assertParser spaces "   aa" (Right unit) 3
+    it "no match" do
+      assertParser spaces "aa" (Right unit) 0
+    it "one match" do
+      assertParser spaces " aa" (Right unit) 1
+    it "new line" do
+      assertParser spaces "\naa" (Right unit) 1
+    it "space or new line" do
+      assertParser spaces " \n \n  aa" (Right unit) 6

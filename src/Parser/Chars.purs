@@ -4,13 +4,16 @@ module Parser.Chars
   , digit
   , satisfy
   , string
+  , spaces
   ) where
 
 import Prelude
 
+import Control.Alt ((<|>))
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (fromCharArray, toCharArray)
+import Data.List (many)
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Parser (ParseError(..), Parser(..), consume)
@@ -52,3 +55,8 @@ char c = satisfy (_ == c)
 
 string :: String -> Parser String
 string s = s # toCharArray <#> char # sequence <#> fromCharArray
+
+spaces :: Parser Unit
+spaces = do
+  _ <- many $ (char ' ') <|> char '\n'
+  pure unit

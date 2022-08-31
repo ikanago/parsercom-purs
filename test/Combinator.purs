@@ -6,8 +6,9 @@ import Control.Monad.Error.Class (class MonadThrow)
 import Data.Either (Either(..))
 import Data.List (List(..), (:), many)
 import Effect.Exception (Error)
+import Parser (ParseError(..))
 import Parser.Chars (char, string)
-import Parser.Combinator (interpose, spaces)
+import Parser.Combinator (interpose, sepBy, sepBy1)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 
@@ -25,14 +26,18 @@ combinator = do
     it "one match" do
       assertParser (many (char 'a')) "ab" (Right $ 'a' : Nil) 1
 
-  describe "spaces" do
+  describe "sepBy" do
     it "basic" do
-      assertParser spaces "   aa" (Right unit) 3
+      assertParser (sepBy (string "abc") (char ',')) "abc,abc,abc,def" (Right $ "abc" : "abc" : "abc" : Nil) 11
     it "no match" do
-      assertParser spaces "aa" (Right unit) 0
+      assertParser (sepBy (string "abc") (char ',')) "def" (Right Nil) 0
     it "one match" do
-      assertParser spaces " aa" (Right unit) 1
-    it "new line" do
-      assertParser spaces "\naa" (Right unit) 1
-    it "space or new line" do
-      assertParser spaces " \n \n  aa" (Right unit) 6
+      assertParser (sepBy (string "abc") (char ',')) "abc,def" (Right $ "abc" : Nil) 3
+
+  describe "sepBy1" do
+    it "basic" do
+      assertParser (sepBy1 (string "abc") (char ',')) "abc,abc,abc,def" (Right $ "abc" : "abc" : "abc" : Nil) 11
+    it "no match" do
+      assertParser (sepBy1 (string "abc") (char ',')) "def" (Left UnexpectedToken) 0
+    it "one match" do
+      assertParser (sepBy1 (string "abc") (char ',')) "abc,def" (Right $ "abc" : Nil) 3
