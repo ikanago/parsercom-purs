@@ -7,7 +7,7 @@ import Data.Either (Either(..))
 import Data.List (List(..), (:), many)
 import Effect.Exception (Error)
 import Parser.Chars (char, string)
-import Parser.Combinator (interpose)
+import Parser.Combinator (interpose, spaces)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 
@@ -24,3 +24,15 @@ combinator = do
       assertParser (many (char 'b')) "aaab" (Right Nil) 0
     it "one match" do
       assertParser (many (char 'a')) "ab" (Right $ 'a' : Nil) 1
+
+  describe "spaces" do
+    it "basic" do
+      assertParser spaces "   aa" (Right unit) 3
+    it "no match" do
+      assertParser spaces "aa" (Right unit) 0
+    it "one match" do
+      assertParser spaces " aa" (Right unit) 1
+    it "new line" do
+      assertParser spaces "\naa" (Right unit) 1
+    it "space or new line" do
+      assertParser spaces " \n \n  aa" (Right unit) 6
