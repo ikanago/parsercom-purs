@@ -4,10 +4,10 @@ import Prelude
 
 import Control.Monad.Error.Class (class MonadThrow)
 import Data.Either (Either(..))
-import Data.List (List(..), (:))
+import Data.List (List(..), (:), many)
 import Effect.Exception (Error)
 import Parser.Chars (char, string)
-import Parser.Combinator (interpose, many)
+import Parser.Combinator (interpose)
 import Test.Spec (SpecT, describe, it)
 import Test.Util (assertParser)
 

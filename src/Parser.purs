@@ -14,7 +14,11 @@ module Parser
 import Prelude
 
 import Control.Alt (class Alt)
+import Control.Alternative (class Alternative)
+import Control.Lazy (class Lazy)
+import Control.Plus (class Plus)
 import Data.Either (Either(..))
+import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (charAt)
 import Data.Tuple (Tuple(..), fst)
@@ -114,3 +118,11 @@ instance altParser :: Alt Parser where
       case res of
         Left _ -> runParser p2 s
         Right res -> Tuple (Right res) s'
+
+instance plusParser :: Plus Parser where
+  empty = failWith EndOfInput
+
+instance alternativeParser :: Alternative Parser
+
+instance lazyParser :: Lazy (Parser (List a)) where
+  defer g = Parser $ \s -> runParser (g unit) s
