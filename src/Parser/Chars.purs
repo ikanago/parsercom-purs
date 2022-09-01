@@ -1,5 +1,6 @@
 module Parser.Chars
-  ( anyChar
+  ( alpha
+  , anyChar
   , char
   , digit
   , int
@@ -13,11 +14,13 @@ module Parser.Chars
 import Prelude
 
 import Control.Alt ((<|>))
-import Data.Foldable (foldMap)
+import Data.CodePoint.Unicode (isAlpha, isDecDigit, isSpace)
 import Data.Either (Either(..))
+import Data.Foldable (foldMap)
 import Data.Int (fromString)
 import Data.List (many, some)
 import Data.Maybe (Maybe(..))
+import Data.String (CodePoint, codePointFromChar)
 import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
@@ -40,20 +43,12 @@ satisfy pred = Parser $ \s ->
         if pred c then Tuple (Right c) s'
         else Tuple (Left UnexpectedToken) s
 
+satisfyCodePoint :: (CodePoint -> Boolean) -> Parser Char
+satisfyCodePoint pred = satisfy $ codePointFromChar >>> pred
+
 digit :: Parser Char
 digit = do
-  satisfy $ case _ of
-    '0' -> true
-    '1' -> true
-    '2' -> true
-    '3' -> true
-    '4' -> true
-    '5' -> true
-    '6' -> true
-    '7' -> true
-    '8' -> true
-    '9' -> true
-    _ -> false
+  satisfyCodePoint isDecDigit
 
 char :: Char -> Parser Char
 char c = satisfy (_ == c)
@@ -63,8 +58,11 @@ string s = s # toCharArray <#> char # sequence <#> fromCharArray
 
 spaces :: Parser Unit
 spaces = do
-  _ <- many $ (char ' ') <|> char '\n'
+  _ <- many $ satisfyCodePoint isSpace
   pure unit
+
+alpha :: Parser Char
+alpha = satisfyCodePoint isAlpha
 
 nat :: Parser Int
 nat = do
