@@ -2,21 +2,26 @@ module Parser.Chars
   ( anyChar
   , char
   , digit
+  , int
+  , nat
+  , neg
   , satisfy
-  , string
   , spaces
+  , string
   ) where
 
 import Prelude
 
 import Control.Alt ((<|>))
+import Data.Foldable (foldMap)
 import Data.Either (Either(..))
+import Data.Int (fromString)
+import Data.List (many, some)
 import Data.Maybe (Maybe(..))
-import Data.String.CodeUnits (fromCharArray, toCharArray)
-import Data.List (many)
+import Data.String.CodeUnits (fromCharArray, singleton, toCharArray)
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
-import Parser (ParseError(..), Parser(..), consume)
+import Parser (ParseError(..), Parser(..), consume, failWith)
 
 -- | Parse the first character in the state.
 anyChar :: Parser Char
@@ -60,3 +65,19 @@ spaces :: Parser Unit
 spaces = do
   _ <- many $ (char ' ') <|> char '\n'
   pure unit
+
+nat :: Parser Int
+nat = do
+  digits <- some digit
+  case digits # (foldMap singleton) # fromString of
+    Just n -> pure n
+    Nothing -> failWith UnexpectedToken
+
+neg :: Parser Int
+neg = do
+  _ <- char '-'
+  negate <$> nat
+
+int :: Parser Int
+int = do
+  nat <|> neg
